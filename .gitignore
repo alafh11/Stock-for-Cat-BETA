@@ -1,0 +1,8 @@
+data/**/*.csv
+
+notebooks/.ipynb_checkpoints/
+
+.DS_Store       # macOS
+Thumbs.db       # Windows
+*.swp           # Vim swap files
+*.pyc           # Compiled Python files
