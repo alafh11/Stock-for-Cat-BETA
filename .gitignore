@@ -1,13 +1,63 @@
-# Ignore all raw data (CSV, temporary files)
-data/raw/**/*
-!data/raw/**/.gitkeep  # Keep .gitkeep files
+# Data folders to ignore
+data/raw/**/*.csv
+data/raw/**/*.CSV
+data/raw/yfinance/**/*.csv
+data/raw/yfinance/**/*.CSV
 
-# Ignore all processed data (Parquet, etc.)
-data/processed/**
-!data/processed/.gitkeep
+# Keep the gitkeep files
+!**/.gitkeep
 
-# Global ignores
-*.csv
-*.parquet
-*.swp
+# Jupyter Notebooks
+*.ipynb
+*.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE
+.idea/
 .DS_Store
+*.swp
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
