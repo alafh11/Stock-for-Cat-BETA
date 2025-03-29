@@ -9,7 +9,20 @@ Thumbs.db       # Windows
 
 data/raw/**/*.csv
 
+# ========================
+# DATA FILES
+# ========================
+# Ignore ALL .csv in raw/ (including subfolders)
+data/raw/**/*.csv
 
+# Ignore ALL files in processed/ EXCEPT README.md
+data/processed/*
+!data/processed/README.md
+!data/processed/.gitkeep
+
+# Ignore .parquet files everywhere
+*.parquet
+  
 
 # ========================
 # DATA FILES
