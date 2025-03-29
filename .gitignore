@@ -6,3 +6,61 @@ notebooks/.ipynb_checkpoints/
 Thumbs.db       # Windows
 *.swp           # Vim swap files
 *.pyc           # Compiled Python files
+
+
+
+# ========================
+# DATA FILES
+# ========================
+data/processed/*          # Ignore all processed data (Parquet, Feather, etc.)
+!data/processed/README.md # Keep documentation
+data/raw/.temp*          # Temporary raw data files
+
+# ========================
+# NOTEBOOKS
+# ========================
+notebooks/.ipynb_checkpoints/
+*.ipynb_*                 # Other notebook metadata
+notebooks/*.log           # Notebook execution logs
+
+# ========================
+# ENVIRONMENT
+# ========================
+.env                      # Environment variables
+.venv/                    # Virtual environment
+venv/
+env/
+.envrc
+.conda/                   # Conda environments
+
+# ========================
+# IDE & EDITOR
+# ========================
+.DS_Store                 # macOS
+Thumbs.db                 # Windows
+*.swp                     # Vim
+*.swo                     # Vim
+*.pyc                     # Python
+__pycache__/
+.idea/
+.vscode/
+*.code-workspace
+
+# ========================
+# PYTHON SPECIFIC
+# ========================
+*.egg-info/
+dist/
+build/
+*.so
+*.pyd
+
+# ========================
+# DATA SCIENCE SPECIFIC
+# ========================
+*.parquet                 # Catch all parquet files
+*.feather                 # Feather format
+*.hdf5                    # HDF5 files
+*.joblib                  # Scikit-learn models
+*.pkl                     # Pickle files
+models/                   # Trained model binaries
