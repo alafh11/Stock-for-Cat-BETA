@@ -4,6 +4,9 @@ data/raw/**/*.CSV
 data/raw/yfinance/**/*.csv
 data/raw/yfinance/**/*.CSV
 
+
+data/processed/*.parquet
+
 # Keep the gitkeep files
 !**/.gitkeep
 # Ignore all CSV files in raw data folders
