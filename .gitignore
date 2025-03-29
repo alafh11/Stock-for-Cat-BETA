@@ -6,6 +6,12 @@ data/raw/yfinance/**/*.CSV
 
 # Keep the gitkeep files
 !**/.gitkeep
+# Ignore all CSV files in raw data folders
+data/raw/**/*.csv
+data/raw/**/*.CSV
+
+# Except the .gitkeep files
+!data/raw/**/.gitkeep
 
 # Jupyter Notebooks
 *.ipynb
