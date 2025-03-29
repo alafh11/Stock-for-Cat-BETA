@@ -1,23 +1,14 @@
-# ========================
-# DATA FILES
-# ========================
-data/processed/*          # Ignore all processed data (Parquet, Feather, etc.)
-!data/processed/README.md # Keep documentation
-data/raw/.temp*          # Temporary raw data files
+data/**/*.csv
 
-# ========================
-# NOTEBOOKS
-# ========================
 notebooks/.ipynb_checkpoints/
-*.ipynb_*                 # Other notebook metadata
-notebooks/*.log           # Notebook execution logs
 
-<<<<<<< HEAD
 .DS_Store       # macOS
 Thumbs.db       # Windows
 *.swp           # Vim swap files
 *.pyc           # Compiled Python files
 
+data/raw/**/*.csv
+
 
 
 # ========================
@@ -34,8 +25,6 @@ notebooks/.ipynb_checkpoints/
 *.ipynb_*                 # Other notebook metadata
 notebooks/*.log           # Notebook execution logs
 
-=======
->>>>>>> 3efcddeb7d2276b0dcbfd4364f41e5f334a3e986
 # ========================
 # ENVIRONMENT
 # ========================
