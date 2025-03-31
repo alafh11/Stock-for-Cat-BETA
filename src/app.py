@@ -5,22 +5,20 @@ from pathlib import Path
 import os
 
 app = Flask(__name__)
-
-# Set up correct paths
-BASE_DIR = Path(__file__).parent
-MODELS_DIR = BASE_DIR / "models"
+MODELS_DIR = Path("models")
 
 
-@app.route("/predict/<model_type>")
-def predict(model_type):
+@app.route("/predict/<ticker>/<model_type>")
+def predict(ticker, model_type):
     try:
         if model_type == "arima":
+            if not (MODELS_DIR / "arima_aapl.pkl").exists():
+                return jsonify({"error": "ARIMA model not found"}), 404
             model = joblib.load(MODELS_DIR / "arima_aapl.pkl")
             pred = model.forecast(steps=7).tolist()
         elif model_type == "lstm":
             model = tf.keras.models.load_model(MODELS_DIR / "lstm_aapl.keras")
-            # Add your LSTM prediction logic here
-            pred = [100, 101, 102]  # Placeholder - replace with real predictions
+            pred = model.predict().tolist()
         else:
             return jsonify({"error": "Invalid model type"}), 400
 
