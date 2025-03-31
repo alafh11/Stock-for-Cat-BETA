@@ -3,8 +3,10 @@ import joblib
 import pandas as pd
 from pathlib import Path
 import numpy as np
-from tensorflow.keras.models import load_model  # Added this import
+from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
+import json
+from prophet.serialize import model_from_json
 
 app = Flask(__name__)
 
@@ -14,21 +16,45 @@ DATA_FILE = BASE_DIR / "data" / "processed" / "model_ready.parquet"
 MODELS_DIR = BASE_DIR / "src" / "models"
 
 
+@app.route("/predict/prophet/<ticker>/<days>")
+def predict_prophet(ticker, days):
+    try:
+        days = min(int(days), 30)
+        model_path = MODELS_DIR / f"prophet_{ticker.lower()}.json"
+
+        with open(model_path, "r") as fin:
+            model = model_from_json(json.load(fin))
+
+        future = model.make_future_dataframe(periods=days, freq="B")
+        forecast = model.predict(future)
+
+        return jsonify(
+            {
+                "ticker": ticker.upper(),
+                "model": "Prophet",
+                "predictions": forecast.tail(days)["yhat"].tolist(),
+                "confidence_intervals": forecast.tail(days)[
+                    ["yhat_lower", "yhat_upper"]
+                ].values.tolist(),
+                "days": days,
+            }
+        )
+
+    except Exception as e:
+        return jsonify({"error": f"Prophet prediction failed: {str(e)}"}), 500
+
+
 @app.route("/predict/arima/<ticker>/<steps>")
 def predict_arima(ticker, steps):
     try:
         ticker = ticker.upper()
-        steps = min(int(steps), 30)  # Keep max 30 days
-
+        steps = min(int(steps), 30)
         model_path = MODELS_DIR / f"arima_{ticker.lower()}.pkl"
 
         if not model_path.exists():
             return jsonify({"error": f"ARIMA model for {ticker} not found"}), 404
 
-        # Load pmdarima model
         model = joblib.load(model_path)
-
-        # Get predictions (pmdarima syntax)
         predictions, conf_int = model.predict(n_periods=steps, return_conf_int=True)
 
         return jsonify(
@@ -50,8 +76,6 @@ def predict_lstm(ticker, steps):
     try:
         ticker = ticker.upper()
         steps = min(int(steps), 30)
-
-        # Model paths
         model_path = MODELS_DIR / f"lstm_{ticker.lower()}.keras"
         scaler_path = MODELS_DIR / f"lstm_scaler.pkl"
 
@@ -61,7 +85,7 @@ def predict_lstm(ticker, steps):
             return jsonify({"error": f"Scaler for {ticker} not found"}), 404
 
         # Load artifacts
-        model = load_model(model_path)  # Now properly imported
+        model = load_model(model_path)
         scaler = joblib.load(scaler_path)
 
         # Prepare data
@@ -74,8 +98,8 @@ def predict_lstm(ticker, steps):
                 400,
             )
 
-        # Scale data
-        data_scaled = scaler.transform(data)
+        # Scale data (ensure 2D input)
+        data_scaled = scaler.transform(data.reshape(-1, 1))
 
         # Create sequence
         sequence = data_scaled[-30:].reshape(1, 30, 1)
@@ -87,10 +111,10 @@ def predict_lstm(ticker, steps):
         for _ in range(steps):
             pred = model.predict(current_seq, verbose=0)[0][0]
             predictions.append(pred)
-            # Update sequence
+            # Update sequence (ensure proper reshaping)
             current_seq = np.append(current_seq[:, 1:, :], [[[pred]]], axis=1)
 
-        # Inverse transform to original scale
+        # Inverse transform (ensure 2D input)
         predictions = (
             scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
             .flatten()
@@ -108,6 +132,19 @@ def predict_lstm(ticker, steps):
 
     except Exception as e:
         return jsonify({"error": f"LSTM prediction failed: {str(e)}"}), 500
+
+
+@app.route("/")
+def index():
+    return jsonify(
+        {
+            "routes": [
+                "/predict/prophet/<ticker>/<days>",
+                "/predict/arima/<ticker>/<steps>",
+                "/predict/lstm/<ticker>/<steps>",
+            ]
+        }
+    )
 
 
 if __name__ == "__main__":
