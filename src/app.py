@@ -1,11 +1,10 @@
 from flask import Flask, jsonify
 import joblib
-import tensorflow as tf
 import pandas as pd
 from pathlib import Path
-from sklearn.preprocessing import MinMaxScaler
 import numpy as np
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model  # Added this import
+from sklearn.preprocessing import MinMaxScaler
 
 app = Flask(__name__)
 
@@ -15,64 +14,34 @@ DATA_FILE = BASE_DIR / "data" / "processed" / "model_ready.parquet"
 MODELS_DIR = BASE_DIR / "src" / "models"
 
 
-# Helper function for LSTM preprocessing
-def preprocess_lstm_data(data, window_size=30):
-    scaler = MinMaxScaler()
-    data_scaled = scaler.fit_transform(data)
-    sequences = []
-    for i in range(len(data_scaled) - window_size):
-        sequences.append(data_scaled[i : i + window_size])
-    return np.array(sequences), scaler
-
-
-# Recursive multi-step LSTM prediction
-def predict_lstm_multistep(model, initial_sequence, steps, scaler):
-    predictions = []
-    current_sequence = initial_sequence
-    for _ in range(steps):
-        pred = model.predict(current_sequence, verbose=0)
-        predictions.append(pred[0][0])  # Extract the predicted value
-        # Shift the sequence and append the new prediction
-        current_sequence = np.append(current_sequence[:, 1:, :], [[pred[0]]], axis=1)
-    return (
-        scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
-        .flatten()
-        .tolist()
-    )
-
-
-@app.route("/")
-def index():
-    return jsonify(
-        {"routes": ["/predict/arima/<ticker>", "/predict/lstm/<ticker>/<steps>"]}
-    )
-
-
-@app.route("/predict/arima/<ticker>")
-def predict_arima(ticker):
+@app.route("/predict/arima/<ticker>/<steps>")
+def predict_arima(ticker, steps):
     try:
         ticker = ticker.upper()
+        steps = min(int(steps), 30)  # Keep max 30 days
+
         model_path = MODELS_DIR / f"arima_{ticker.lower()}.pkl"
 
-        # Check if ARIMA model file exists
         if not model_path.exists():
             return jsonify({"error": f"ARIMA model for {ticker} not found"}), 404
 
-        # Load ARIMA model
+        # Load pmdarima model
         model = joblib.load(model_path)
 
-        # Generate 7-step forecast
-        predictions = model.forecast(steps=7).tolist()
+        # Get predictions (pmdarima syntax)
+        predictions, conf_int = model.predict(n_periods=steps, return_conf_int=True)
 
-        # Check if predictions are valid
-        if not predictions or len(predictions) == 0:
-            return jsonify({"error": "ARIMA model failed to generate predictions"}), 500
-
-        # Return predictions as JSON
-        return jsonify({"ticker": ticker, "model": "ARIMA", "predictions": predictions})
+        return jsonify(
+            {
+                "ticker": ticker,
+                "model": "ARIMA",
+                "predictions": predictions.tolist(),
+                "confidence_intervals": conf_int.tolist(),
+                "steps": steps,
+            }
+        )
 
     except Exception as e:
-        # Return error message as JSON
         return jsonify({"error": f"ARIMA prediction failed: {str(e)}"}), 500
 
 
@@ -80,42 +49,65 @@ def predict_arima(ticker):
 def predict_lstm(ticker, steps):
     try:
         ticker = ticker.upper()
-        steps = int(steps)
+        steps = min(int(steps), 30)
 
-        # Load LSTM model and scaler
+        # Model paths
         model_path = MODELS_DIR / f"lstm_{ticker.lower()}.keras"
         scaler_path = MODELS_DIR / f"lstm_scaler.pkl"
 
         if not model_path.exists():
             return jsonify({"error": f"LSTM model for {ticker} not found"}), 404
         if not scaler_path.exists():
-            return jsonify({"error": f"Scaler file for {ticker} not found"}), 404
+            return jsonify({"error": f"Scaler for {ticker} not found"}), 404
 
-        model = load_model(model_path)
+        # Load artifacts
+        model = load_model(model_path)  # Now properly imported
         scaler = joblib.load(scaler_path)
 
-        # Load and preprocess data
+        # Prepare data
         df = pd.read_parquet(DATA_FILE)
         data = df[df["ticker"] == ticker][["close"]].values
 
         if len(data) < 30:
             return (
-                jsonify(
-                    {"error": f"Not enough data for LSTM modeling for ticker {ticker}"}
-                ),
+                jsonify({"error": f"Need at least 30 days of data for {ticker}"}),
                 400,
             )
 
-        # Prepare the initial sequence
-        X, _ = preprocess_lstm_data(data, window_size=30)
-        initial_sequence = X[-1:]  # Use the last sequence from data
+        # Scale data
+        data_scaled = scaler.transform(data)
 
-        # Perform multi-step prediction
-        predictions = predict_lstm_multistep(model, initial_sequence, steps, scaler)
+        # Create sequence
+        sequence = data_scaled[-30:].reshape(1, 30, 1)
 
-        return jsonify({"ticker": ticker, "model": "LSTM", "predictions": predictions})
+        # Generate predictions
+        predictions = []
+        current_seq = sequence.copy()
+
+        for _ in range(steps):
+            pred = model.predict(current_seq, verbose=0)[0][0]
+            predictions.append(pred)
+            # Update sequence
+            current_seq = np.append(current_seq[:, 1:, :], [[[pred]]], axis=1)
+
+        # Inverse transform to original scale
+        predictions = (
+            scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
+            .flatten()
+            .tolist()
+        )
+
+        return jsonify(
+            {
+                "ticker": ticker,
+                "model": "LSTM",
+                "predictions": predictions,
+                "steps": steps,
+            }
+        )
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"LSTM prediction failed: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
