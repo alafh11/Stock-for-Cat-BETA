@@ -10,7 +10,6 @@ from prophet.serialize import model_from_json
 
 app = Flask(__name__)
 
-# Paths setup
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_FILE = BASE_DIR / "data" / "processed" / "model_ready.parquet"
 MODELS_DIR = BASE_DIR / "src" / "models"
@@ -84,11 +83,9 @@ def predict_lstm(ticker, steps):
         if not scaler_path.exists():
             return jsonify({"error": f"Scaler for {ticker} not found"}), 404
 
-        # Load artifacts
         model = load_model(model_path)
         scaler = joblib.load(scaler_path)
 
-        # Prepare data
         df = pd.read_parquet(DATA_FILE)
         data = df[df["ticker"] == ticker][["close"]].values
 
@@ -98,23 +95,18 @@ def predict_lstm(ticker, steps):
                 400,
             )
 
-        # Scale data (ensure 2D input)
         data_scaled = scaler.transform(data.reshape(-1, 1))
 
-        # Create sequence
         sequence = data_scaled[-30:].reshape(1, 30, 1)
 
-        # Generate predictions
         predictions = []
         current_seq = sequence.copy()
 
         for _ in range(steps):
             pred = model.predict(current_seq, verbose=0)[0][0]
             predictions.append(pred)
-            # Update sequence (ensure proper reshaping)
             current_seq = np.append(current_seq[:, 1:, :], [[[pred]]], axis=1)
 
-        # Inverse transform (ensure 2D input)
         predictions = (
             scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
             .flatten()

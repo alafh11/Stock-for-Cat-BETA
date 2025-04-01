@@ -4,12 +4,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Configure page
 st.set_page_config(page_title="Stock Forecaster Pro", layout="wide")
 st.title("📊 Advanced Stock Forecaster")
 st.markdown("Predict future prices using Prophet, ARIMA or LSTM models")
 
-# Sidebar configuration
 with st.sidebar:
     st.header("Model Configuration")
     ticker = st.text_input("Stock Ticker", "AAPL").strip().upper()
@@ -23,7 +21,6 @@ with st.sidebar:
     else:
         st.info("LSTM: Captures complex patterns")
 
-# Main content
 if st.button("Generate Forecast", type="primary"):
     try:
         endpoint = f"http://localhost:5000/predict/{model_type.lower()}/{ticker}/{days}"
@@ -34,7 +31,6 @@ if st.button("Generate Forecast", type="primary"):
             if response.status_code == 200:
                 data = response.json()
 
-                # Create forecast dataframe
                 forecast_df = pd.DataFrame(
                     {
                         "Day": np.arange(1, days + 1),
@@ -42,7 +38,6 @@ if st.button("Generate Forecast", type="primary"):
                     }
                 )
 
-                # Plot results
                 fig, ax = plt.subplots(figsize=(12, 6))
                 ax.plot(
                     forecast_df["Day"],
@@ -52,7 +47,6 @@ if st.button("Generate Forecast", type="primary"):
                     label="Prediction",
                 )
 
-                # Add confidence intervals if available
                 if "confidence_intervals" in data:
                     conf_int = np.array(data["confidence_intervals"])
                     ax.fill_between(
@@ -71,7 +65,6 @@ if st.button("Generate Forecast", type="primary"):
                 ax.grid(True, alpha=0.3)
                 st.pyplot(fig)
 
-                # Show data table
                 st.dataframe(forecast_df.style.format({"Predicted Price": "${:.2f}"}))
 
             else:
@@ -82,7 +75,6 @@ if st.button("Generate Forecast", type="primary"):
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
 
-# Model information
 with st.expander("Model Details"):
     if model_type == "Prophet":
         st.markdown(
