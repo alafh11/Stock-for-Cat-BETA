@@ -1,24 +1,16 @@
-# Data folders to ignore
+# Data files
 data/raw/**/*.csv
 data/raw/**/*.CSV
-data/raw/yfinance/**/*.csv
-data/raw/yfinance/**/*.CSV
-
-
 data/processed/*.parquet
-
-# Keep the gitkeep files
 !**/.gitkeep
-# Ignore all CSV files in raw data folders
-data/raw/**/*.csv
-data/raw/**/*.CSV
 
-# Except the .gitkeep files
-!data/raw/**/.gitkeep
+# Model files
+src/models/*.pkl
+src/models/*.keras
+src/models/*.json
 
-# Jupyter Notebooks
-*.ipynb
-*.ipynb_checkpoints/
+# Generated visualizations
+notebooks/visualizations/*.png
 
 # Python
 __pycache__/
@@ -65,9 +57,9 @@ ENV/
 env.bak/
 venv.bak/
 pythonenv*
+.python-version
 
 # Logs and databases
 *.log
 *.sql
 *.sqlite
-
