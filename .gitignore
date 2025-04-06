@@ -50,7 +50,9 @@ MANIFEST
 
 # Environments
 .env
-.venv
+.venv/*
+!.venv/app.py
+!.venv/dashboard.py
 env/
 venv/
 ENV/
