@@ -48,11 +48,14 @@ MANIFEST
 .DS_Store
 *.swp
 
-# Environments
-.env
+
 .venv/*
+
 !.venv/app.py
 !.venv/dashboard.py
+
+# Environments
+.env
 env/
 venv/
 ENV/
