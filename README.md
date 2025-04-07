@@ -29,4 +29,28 @@ Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 ### 🎛️ Dashboard Upgrades
 
 
+## 🛠️ Installation
+
+### 1 Clone and Setup the Project:
+```
+git clone https://github.com/alafh11/Stock-for-Cat-BETA.git
+cd Stock-for-Cat-BETA
+pip install -r requirements.txt
+```
+### 2  Launch the Application:
+
+You'll need to run two services in separate terminals:
+
+🖥️ Terminal 1: Flask Backend Server
+```
+python src/app.py
+```
+
+📊 Terminal 2: Streamlit Dashboard
+```
+streamlit run src/dashboard.py
+```
+
+
+
 
