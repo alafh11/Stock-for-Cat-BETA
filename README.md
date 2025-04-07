@@ -23,25 +23,10 @@ Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 Here's a future roadmap section you can add to your README, keeping your fun cat-themed branding while showing ambitious plans:
 
 
-## 🚀 Future Plans
+## 🔮 Future Plans
 
 ### 📈 Additional Models
 
-CatBoost - Gradient boosting for tabular data
-
-Transformer Models - State-of-the-art time series forecasting
-
-Hybrid Models - Combining LSTM + Prophet strengths
-
-Random Forests - For feature importance analysis
-
 ### 📊 Multi-Stock Expansion
 
-FAANG Stocks - Facebook, Amazon, Apple, Netflix, Google
-
-Tech Sector - Microsoft, Tesla, NVIDIA, AMD
-
-ETF Support - SPY, QQQ for broader market analysis
-
-Custom Watchlists - User-defined stock portfolios
 
