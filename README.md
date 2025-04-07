@@ -24,7 +24,9 @@ Here's a future roadmap section you can add to your README, keeping your fun cat
 
 
 ## 🚀 Future Plans
+
 ### 📈 Additional Models
+
 CatBoost - Gradient boosting for tabular data
 
 Transformer Models - State-of-the-art time series forecasting
@@ -33,7 +35,8 @@ Hybrid Models - Combining LSTM + Prophet strengths
 
 Random Forests - For feature importance analysis
 
-## 📊 Multi-Stock Expansion
+### 📊 Multi-Stock Expansion
+
 FAANG Stocks - Facebook, Amazon, Apple, Netflix, Google
 
 Tech Sector - Microsoft, Tesla, NVIDIA, AMD
