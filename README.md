@@ -20,4 +20,15 @@ Forecasting with Prophet and LSTM models
 
 Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 
+Here's a future roadmap section you can add to your README, keeping your fun cat-themed branding while showing ambitious plans:
+
+---
+
+## 🐾 Future Roadmap (Where We're Pouncing Next!)
+
+### 📈 Model Menagerie
+- [ ] **More Fancy Models**  
+  `+ CatBoost` (how purr-fect would that be?)  
+  `+ Transformer models` for time-series  
+  `+ Ensemble approaches` to combine predictions
 
