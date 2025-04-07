@@ -20,9 +20,6 @@ Forecasting with Prophet and LSTM models
 
 Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 
-Here's a future roadmap section you can add to your README, keeping your fun cat-themed branding while showing ambitious plans:
-
-
 ## 🔮 Future Plans
 
 ### 📈 Additional Models
