@@ -19,3 +19,8 @@ Exploratory Data Analysis (EDA)
 Forecasting with Prophet and LSTM models
 
 Interactive Dashboard: Basic Streamlit app for visualizing forecasts
+
+
+##🚧 Important Setup Notes
+
+Project Structure Update: Due to TensorFlow dependency issues, the main application files (app.py and dashboard.py) have been moved from the src/ directory to the root folder. This change was necessary to resolve virtual environment conflicts.
