@@ -1,8 +1,11 @@
 # Stock For Cat (BETA) 📈🐱
-##📌 Project Overview
+# # 📌 Project Overview
+
+
 This is a beta version of a stock analysis dashboard that currently focuses on AAPL (Apple Inc.) stock as a proof of concept. The project demonstrates a pipeline for financial data analysis and forecasting that can be expanded to other stocks in the future.
 
-##🚀 Key Features
+# # 🚀 Key Features
+
 Proof of Concept: Currently tested on AAPL stock (1/100 planned)
 
 Complete Analysis Pipeline:
