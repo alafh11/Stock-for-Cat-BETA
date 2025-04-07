@@ -29,4 +29,7 @@ Here's a future roadmap section you can add to your README, keeping your fun cat
 
 ### 📊 Multi-Stock Expansion
 
+### 🎛️ Dashboard Upgrades
+
+
 
