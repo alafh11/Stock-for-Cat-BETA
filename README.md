@@ -43,7 +43,7 @@ You'll need to run two services in separate terminals:
 
 🖥️ Terminal 1: Flask Backend Server
 ```
-python src/app.py
+py .\app.py
 ```
 
 📊 Terminal 2: Streamlit Dashboard
