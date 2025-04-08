@@ -48,7 +48,7 @@ python src/app.py
 
 📊 Terminal 2: Streamlit Dashboard
 ```
-streamlit run src/dashboard.py
+streamlit run dashboard.py
 ```
 
 
