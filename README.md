@@ -16,7 +16,7 @@ Data cleaning and preprocessing
 
 Exploratory Data Analysis (EDA)
 
-Forecasting with Prophet and LSTM models
+Forecasting with Prophet and Arima models
 
 Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 
