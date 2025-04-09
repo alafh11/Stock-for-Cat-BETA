@@ -8,12 +8,25 @@ from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 import json
 from prophet.serialize import model_from_json
+from statsmodels.tsa.arima.model import ARIMA
 
 app = Flask(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_FILE = BASE_DIR / "data" / "processed" / "model_ready.parquet"
 MODELS_DIR = BASE_DIR / "src" / "models"
+
+
+def generate_business_dates(last_date, days):
+    """Generate next N business days"""
+    dates = []
+    current_date = last_date + timedelta(days=1)
+    while len(dates) < days:
+        if current_date.weekday() < 5:
+            dates.append(current_date.strftime("%Y-%m-%d"))
+        current_date += timedelta(days=1)
+    return dates
+
 
 @app.route("/predict/prophet/<ticker>/<days>")
 def predict_prophet(ticker, days):
@@ -26,16 +39,14 @@ def predict_prophet(ticker, days):
 
         future = model.make_future_dataframe(periods=days, freq="B")
         forecast = model.predict(future)
-        
-        forecast_tail = forecast.tail(days)
-        
+
         return jsonify(
             {
                 "ticker": ticker.upper(),
                 "model": "Prophet",
-                "dates": forecast_tail["ds"].dt.strftime('%Y-%m-%d').tolist(),
-                "predictions": forecast_tail["yhat"].tolist(),
-                "confidence_intervals": forecast_tail[
+                "dates": forecast.tail(days)["ds"].dt.strftime("%Y-%m-%d").tolist(),
+                "predictions": forecast.tail(days)["yhat"].tolist(),
+                "confidence_intervals": forecast.tail(days)[
                     ["yhat_lower", "yhat_upper"]
                 ].values.tolist(),
                 "days": days,
@@ -45,71 +56,49 @@ def predict_prophet(ticker, days):
     except Exception as e:
         return jsonify({"error": f"Prophet prediction failed: {str(e)}"}), 500
 
-@app.route("/predict/lstm/<ticker>/<steps>")
-def predict_lstm(ticker, steps):
+
+@app.route("/predict/arima/<ticker>/<days>")
+def predict_arima(ticker, days):
     try:
-        ticker = ticker.upper()
-        steps = min(int(steps), 30)
-        model_path = MODELS_DIR / f"lstm_{ticker.lower()}.keras"
-        scaler_path = MODELS_DIR / f"lstm_scaler.pkl"
+        days = min(int(days), 30)
+        model_path = MODELS_DIR / f"arima_111_{ticker.lower()}.pkl"
 
         if not model_path.exists():
-            return jsonify({"error": f"LSTM model for {ticker} not found"}), 404
-        if not scaler_path.exists():
-            return jsonify({"error": f"Scaler for {ticker} not found"}), 404
+            return jsonify({"error": f"ARIMA model for {ticker} not found"}), 404
 
-        model = load_model(model_path)
-        scaler = joblib.load(scaler_path)
+        # Load model
+        model = joblib.load(model_path)
 
         df = pd.read_parquet(DATA_FILE)
-        ticker_data = df[df["ticker"] == ticker]
-        data = ticker_data[["close"]].values
-        
-        if len(data) < 30:
+        ticker_data = df[df["ticker"] == ticker.upper()]
+
+        if len(ticker_data) < 30:
             return (
                 jsonify({"error": f"Need at least 30 days of data for {ticker}"}),
                 400,
             )
 
-        data_scaled = scaler.transform(data.reshape(-1, 1))
-        sequence = data_scaled[-30:].reshape(1, 30, 1)
+        forecast = model.forecast(steps=days)
 
-        predictions = []
-        current_seq = sequence.copy()
+        predictions = [float(x) for x in forecast]
 
-        for _ in range(steps):
-            pred = model.predict(current_seq, verbose=0)[0][0]
-            predictions.append(pred)
-            current_seq = np.append(current_seq[:, 1:, :], [[[pred]]], axis=1)
-
-        predictions = (
-            scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
-            .flatten()
-            .tolist()
-        )
-        
         last_date = ticker_data.index[-1].to_pydatetime()
-        future_dates = []
-        current_date = last_date
-        
-        for _ in range(steps):
-            current_date += timedelta(days=1)
-            while current_date.weekday() >= 5:  
-                current_date += timedelta(days=1)
-            future_dates.append(current_date.strftime('%Y-%m-%d'))
+        future_dates = generate_business_dates(last_date, days)
 
         return jsonify(
             {
-                "ticker": ticker,
-                "model": "LSTM",
+                "ticker": ticker.upper(),
+                "model": "ARIMA",
                 "dates": future_dates,
                 "predictions": predictions,
-                "steps": steps,
+                "days": days,
             }
         )
 
     except Exception as e:
-        return jsonify({"error": f"LSTM prediction failed: {str(e)}"}), 500
+        app.logger.error(f"ARIMA prediction error: {str(e)}")
+        return jsonify({"error": f"ARIMA prediction failed: {str(e)}"}), 500
+
 
 @app.route("/")
 def index():
@@ -118,13 +107,11 @@ def index():
             "routes": [
                 "/predict/prophet/<ticker>/<days>",
                 "/predict/lstm/<ticker>/<steps>",
+                "/predict/arima/<ticker>/<days>",
             ]
         }
     )
 
+
 if __name__ == "__main__":
     app.run(debug=True)
-    
-    
-    
-    
