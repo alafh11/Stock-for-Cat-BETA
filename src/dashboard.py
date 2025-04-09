@@ -7,7 +7,7 @@ from datetime import datetime
 import numpy as np
 
 st.set_page_config(page_title="Stock Forecaster Pro", layout="wide")
-st.title("📈 Stock Forecaster Pro")
+st.title("Stock For Cat (BETA) 📈🐱 ")
 st.markdown("Predict future prices using advanced forecasting models")
 
 with st.sidebar:
@@ -62,7 +62,6 @@ if st.button("Generate Forecast", type="primary"):
             response = requests.get(endpoint)
             response.raise_for_status()
             data = response.json()
-
             plot_forecast(data)
 
             df = pd.DataFrame(
@@ -107,7 +106,6 @@ with st.expander("📚 Model Documentation"):
             - Developed by Facebook  
             - Handles seasonality and holidays automatically  
             - Provides uncertainty intervals  
-            - Best for 1 week to 6 month forecasts  
             """
         )
     else:
@@ -122,4 +120,4 @@ with st.expander("📚 Model Documentation"):
         )
 
 st.markdown("---")
-st.caption("© 2025 Stock Forecaster Pro | Data updates daily")
+st.caption("© 2025 Stock For Cat (BETA) 📈🐱 | Data updates daily")

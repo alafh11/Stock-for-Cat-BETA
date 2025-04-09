@@ -4,7 +4,8 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from datetime import datetime, timedelta
-from tensorflow.keras.models import load_model
+
+# from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 import json
 from prophet.serialize import model_from_json
@@ -66,7 +67,6 @@ def predict_arima(ticker, days):
         if not model_path.exists():
             return jsonify({"error": f"ARIMA model for {ticker} not found"}), 404
 
-        # Load model
         model = joblib.load(model_path)
 
         df = pd.read_parquet(DATA_FILE)
@@ -106,7 +106,6 @@ def index():
         {
             "routes": [
                 "/predict/prophet/<ticker>/<days>",
-                "/predict/lstm/<ticker>/<steps>",
                 "/predict/arima/<ticker>/<days>",
             ]
         }

@@ -18,3 +18,4 @@ python-dotenv==1.0.0
 requests==2.32.3
 scipy==1.15.2
 statsmodels
+pmdarima==2.0.4
