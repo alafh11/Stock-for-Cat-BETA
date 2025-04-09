@@ -2,13 +2,13 @@
 ## 📌 Project Overview
 
 
-This is a beta version of a stock analysis dashboard that currently focuses on AAPL (Apple Inc.) stock as a proof of concept. The project demonstrates a pipeline for financial data analysis and forecasting that can be expanded to other stocks in the future.
+This is a beta version of a stock analysis dashboard that currently focuses on AAPL (Apple Inc.) stock as a proof of concept. The project demonstrates a scalable pipeline for financial data analysis and forecasting that can be expanded to other stocks in the future.
 
 ## 🚀 Key Features
 
-Proof of Concept: Currently tested on AAPL stock (1/100 planned)
+Proof of Concept – Currently supports AAPL (1/100 planned stocks)
 
-Complete Analysis Pipeline:
+End-to-End Analysis Pipeline:
 
 Data importation from Yahoo Finance
 
@@ -16,8 +16,7 @@ Data cleaning and preprocessing
 
 Exploratory Data Analysis (EDA)
 
-Forecasting with Prophet and Arima models
-
+Forecasting using Prophet and ARIMA models (experimental, see Model Status below)
 Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 
 ## 🔮 Future Plans
@@ -27,6 +26,10 @@ Interactive Dashboard: Basic Streamlit app for visualizing forecasts
 ### 📊 Multi-Stock Expansion
 
 ### 🎛️ Dashboard Upgrades
+
+
+## ⚠️ Model Status
+⚠️ Experimental Phase – Current models (Prophet & ARIMA) are under evaluation and may require further tuning for optimal performance. Contributions and feedback are welcome!
 
 
 ## 🛠️ Installation
